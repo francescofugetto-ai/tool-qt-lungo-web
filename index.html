@@ -1,0 +1,871 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tool QT lungo">
+<meta name="theme-color" content="#FAF9F7">
+<script data-iphone="sentinella">
+(function(){
+var h=document.documentElement, msg="";
+function ha(c){ return (" "+h.className+" ").indexOf(" "+c+" ")>=0; }
+// L'errore puo' arrivare prima che l'avviso esista — uno script in <head> che
+// non si lascia leggere —: il messaggio si tiene da parte e si scrive quando
+// la pagina c'e'.
+function scrivi(){
+  var e=document.getElementById("nmerr");
+  if(e&&msg) e.textContent="Errore del motore: "+msg;
+}
+function ko(m){
+  if(m&&!msg) msg=m;
+  if(!ha("motore-ko")) h.className+=" motore-ko";
+  scrivi();
+}
+h.className+=" js";
+window.onerror=function(m,src,riga,col){
+  m=String(m);
+  if(/^Script error\.?$/.test(m)) m="il browser non ne mostra il dettaglio (\u00abScript error.\u00bb)";
+  ko(m+(riga?" (riga "+riga+(col?", colonna "+col:"")+")":""));
+};
+document.addEventListener("DOMContentLoaded",function(){
+  if(!ha("motore-ok")) ko(msg||"il motore non ha completato l'avvio"); else scrivi();
+});
+})();
+</script>
+<title>QT lungo congenito — punteggio, diagnosi e terapia</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  :root {
+    --bg:#FAF9F7; --surface:#FFFFFF; --surface-alt:#F3F2EF;
+    --border:rgba(11,11,11,0.10); --border-strong:rgba(11,11,11,0.18);
+    --text-primary:#0B0B0B; --text-secondary:#52514E; --text-muted:#76746F;
+    --accent-blue:#2A78D6;   --accent-blue-bg:#E6F1FB;   --accent-blue-border:#B5D4F4;
+    --accent-amber:#BA7517;  --accent-amber-bg:#FAEEDA;  --accent-amber-border:#FAC775;
+    --accent-red:#A32D2D;    --accent-red-bg:#FCEBEB;    --accent-red-border:#F7C1C1;
+    --accent-green:#3B6D11;  --accent-green-bg:#EAF3DE;  --accent-green-border:#C0DD97;
+    --cor-1:#3B8E5A; --cor-2a:#E0A82E; --cor-2b:#DE7E3C; --cor-3:#B33A3A;
+    --k0:#2E7D4F; --k0-bg:#E2F3E8; --k0-bd:#A6D9B8;
+    --k1:#2A78D6; --k1-bg:#E3EFFB; --k1-bd:#A9CBF1;
+    --k2:#8A6A00; --k2-bg:#FBF3C8; --k2-bd:#EBD56C;
+    --k3:#B45309; --k3-bg:#FDEBD8; --k3-bd:#F4BD85;
+    --k4:#A32D2D; --k4-bg:#FCE3E3; --k4-bd:#F0A9A9;
+    --grid:rgba(42,120,214,.08);
+    --font:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --display:'IBM Plex Sans Condensed','Arial Narrow',-apple-system,'Segoe UI',sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,Consolas,'Courier New',monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#111418; --surface:#181C22; --surface-alt:#20252D;
+      --border:rgba(255,255,255,.10); --border-strong:rgba(255,255,255,.19);
+      --text-primary:#E7EAEE; --text-secondary:#B8BEC7; --text-muted:#949BA5;
+      --accent-blue:#72AAEE;   --accent-blue-bg:#18283A;   --accent-blue-border:#2E4B6C;
+      --accent-amber:#E3A94F;  --accent-amber-bg:#30250F;  --accent-amber-border:#5D4719;
+      --accent-red:#EF8E8E;    --accent-red-bg:#361B1B;    --accent-red-border:#6B3232;
+      --accent-green:#95C873;  --accent-green-bg:#1C2A13;  --accent-green-border:#3C5626;
+      --k0:#8FD3A8; --k0-bg:#132B1D; --k0-bd:#2D5A3E;
+      --k1:#8EC0F5; --k1-bg:#16283C; --k1-bd:#2F5378;
+      --k2:#EDD36A; --k2-bg:#2C260C; --k2-bd:#5E5120;
+      --k3:#F3B27A; --k3-bg:#33210F; --k3-bd:#6B4524;
+      --k4:#F29A9A; --k4-bg:#361B1B; --k4-bd:#6B3232;
+      --grid:rgba(114,170,238,.07);
+      color-scheme:dark;
+    }
+  }
+  body { font-family:var(--font); background:var(--bg); color:var(--text-primary); font-size:14.5px; line-height:1.65; -webkit-font-smoothing:antialiased; }
+  .page { max-width:960px; margin:0 auto; padding:0 16px 4rem; }
+  strong, b { font-weight:600; }
+  .muted { color:var(--text-muted); }
+  .hero { margin:0 -16px 0; padding:2.2rem 16px 1.3rem; border-bottom:1px solid var(--border);
+          background-color:var(--bg);
+          background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+          background-size:22px 22px; }
+  .kicker { font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--accent-blue); margin-bottom:8px; }
+  .headline { font-family:var(--display); font-size:30px; font-weight:700; line-height:1.12; margin-bottom:10px; }
+  .lede { font-size:14.5px; color:var(--text-secondary); max-width:760px; margin-bottom:12px; }
+  .lede strong { color:var(--text-primary); }
+  .meta-row { display:flex; flex-wrap:wrap; gap:6px 8px; font-size:12px; }
+  .meta-chip { background:var(--surface); border:1px solid var(--border-strong); border-radius:99px; padding:2px 10px; color:var(--text-secondary); overflow-wrap:anywhere; }
+  .meta-chip strong { color:var(--text-primary); }
+  .bar { position:-webkit-sticky;position:sticky; top:0; z-index:30; background:var(--bg); border-bottom:1px solid var(--border-strong);
+         margin:0 -16px 1.2rem; padding:8px 16px; display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; }
+  .bar .lbl { font-family:var(--mono); font-size:10.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); }
+  .bar .sp { flex:1 1 auto; }
+  .btn { font:600 12.5px var(--font); padding:6px 13px; border-radius:99px; border:1px solid var(--border-strong); background:var(--surface); color:var(--text-secondary); cursor:pointer; }
+  .btn:hover { border-color:var(--accent-blue); color:var(--accent-blue); }
+  .stage { display:flex; align-items:baseline; gap:10px; margin:2rem 0 .7rem; padding-bottom:6px; border-bottom:2px solid var(--border-strong); }
+  .stage-n { font-family:var(--mono); font-size:12px; font-weight:600; color:#FFFFFF; background:var(--accent-blue); border-radius:6px; padding:1px 7px; }
+  .stage-t { font-family:var(--display); font-size:20px; font-weight:700; line-height:1.2; }
+  .stage-w { margin-left:auto; font-size:11.5px; color:var(--text-muted); text-align:right; }
+  .card { background:var(--surface); border:1px solid var(--border-strong); border-radius:12px; padding:14px 16px; margin-bottom:12px; }
+  .card h3 { font-size:13px; font-weight:600; letter-spacing:.02em; margin-bottom:8px; color:var(--text-secondary); }
+  .row { display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; margin-bottom:10px; }
+  .row:last-child { margin-bottom:0; }
+  .fl { font-size:12.5px; font-weight:600; color:var(--text-secondary); min-width:150px; }
+  .fl small { display:block; font-weight:400; color:var(--text-muted); font-size:11.5px; }
+  input[type=number] { font:500 15px var(--font); color:var(--text-primary); background:var(--surface); border:1px solid var(--border-strong); border-radius:8px; padding:6px 9px; width:92px; text-align:center; }
+  .seg { display:inline-flex; flex-wrap:wrap; border:1px solid var(--border-strong); border-radius:10px; overflow:hidden; }
+  .seg label { position:relative; cursor:pointer; }
+  .seg input { position:absolute; opacity:0; width:1px; height:1px; }
+  .seg span { display:block; padding:6px 12px; font-size:13.5px; font-weight:500; color:var(--text-secondary); border-right:1px solid var(--border); }
+  .seg label:last-child span { border-right:none; }
+  .seg input:checked + span { background:var(--text-primary); color:var(--bg); }
+  .seg input:focus-visible + span { outline:2px solid var(--accent-blue); outline-offset:-2px; }
+  .chk { display:flex; align-items:flex-start; gap:9px; padding:6px 0; font-size:14px; line-height:1.45; border-bottom:1px dashed var(--border); cursor:pointer; }
+  .chk:last-child { border-bottom:none; }
+  .chk input { margin-top:3px; width:17px; height:17px; flex:0 0 auto; accent-color:var(--accent-blue); }
+  .chk small { display:block; color:var(--text-muted); font-size:12px; }
+  .chk .tx { flex:1 1 auto; min-width:0; }
+  .riga { display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; padding:6px 0; border-bottom:1px dashed var(--border); }
+  .riga .fl { min-width:0; flex:1 1 180px; }
+  .hide { display:none !important; }
+  .esito { display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-bottom:4px; }
+  .cat { display:inline-block; font-size:12.5px; font-weight:600; border-radius:99px; padding:2px 10px; border:1px solid; }
+  .k0 { color:var(--k0); background:var(--k0-bg); border-color:var(--k0-bd); }
+  .k1 { color:var(--k1); background:var(--k1-bg); border-color:var(--k1-bd); }
+  .k2 { color:var(--k2); background:var(--k2-bg); border-color:var(--k2-bd); }
+  .k3 { color:var(--k3); background:var(--k3-bg); border-color:var(--k3-bd); }
+  .k4 { color:var(--k4); background:var(--k4-bg); border-color:var(--k4-bd); }
+  .kx { color:var(--text-muted); background:var(--surface-alt); border-color:var(--border-strong); }
+  .big { font-family:var(--display); font-size:26px; font-weight:700; line-height:1.15; }
+  .cor { display:inline-block; font-family:var(--mono); font-size:11px; font-weight:600; color:#FFFFFF; border-radius:4px; padding:0 5px; margin:0 1px; white-space:nowrap; vertical-align:1px; }
+  .c1 { background:var(--cor-1); } .c2a { background:var(--cor-2a); color:#1D1602; } .c2b { background:var(--cor-2b); } .c3 { background:var(--cor-3); }
+  .pg { font-family:var(--mono); font-size:11px; color:var(--text-muted); }
+  .dv { font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:.03em; color:var(--accent-red); background:var(--accent-red-bg); border:1px solid var(--accent-red-border); border-radius:4px; padding:0 5px; white-space:nowrap; }
+  .nota { border-left:3px solid var(--accent-amber); background:var(--accent-amber-bg); border-radius:0 8px 8px 0; padding:7px 11px; margin-top:8px; font-size:13.5px; }
+  .nota.info { border-left-color:var(--accent-blue); background:var(--accent-blue-bg); }
+  .nota.stop { border-left-color:var(--accent-red); background:var(--accent-red-bg); }
+  .nota.ok { border-left-color:var(--accent-green); background:var(--accent-green-bg); }
+  .nota.spenta { border-left-color:var(--border-strong); background:var(--surface-alt); color:var(--text-secondary); }
+  .nota strong { color:var(--text-primary); }
+  .passo { display:flex; gap:10px; padding:8px 0; border-bottom:1px dashed var(--border); }
+  .passo:last-child { border-bottom:none; }
+  .passo .ico { flex:0 0 26px; font-weight:700; text-align:center; font-family:var(--mono); font-size:13px; padding-top:1px; }
+  .passo .tx { flex:1 1 auto; font-size:14px; min-width:0; overflow-wrap:anywhere; }
+  .passo.att { background:var(--accent-blue-bg); border-radius:8px; border-bottom-color:transparent; padding:8px 8px; margin:2px -8px; }
+  .passo.att .ico { color:var(--accent-blue); }
+  .lista li { margin:4px 0 4px 18px; font-size:13.5px; }
+  .foot { margin-top:2.4rem; padding-top:1rem; border-top:1px solid var(--border-strong); font-size:12px; color:var(--text-muted); line-height:1.7; }
+  .foot strong { color:var(--text-secondary); }
+  .farm { border-left:4px solid var(--border-strong); }
+  .farm.s-ok { border-left-color:var(--k0); }
+  .farm.s-ris { border-left-color:var(--accent-amber); }
+  .farm.s-no { border-left-color:var(--k4); }
+  .farm .nome { font-family:var(--display); font-size:21px; font-weight:700; line-height:1.15; }
+  .sint { display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; padding:6px 0; border-bottom:1px dashed var(--border); font-size:14px; }
+  .sint:last-child { border-bottom:none; }
+  .sint .n { font-weight:600; min-width:110px; }
+  .sint .d { color:var(--text-secondary); font-size:13px; }
+  @media (max-width:640px) {
+    .headline { font-size:25px; }
+    .stage-w { display:none; }
+    .fl { min-width:0; width:100%; }
+    .big { font-size:22px; }
+    .farm .nome { font-size:19px; }
+    .page { overflow-wrap:anywhere; }
+  }
+  .chk.on .tx { color:var(--text-primary); font-weight:500; }
+  @media print { .bar { position:static; } }
+</style>
+<style>
+  .voce { display:flex; align-items:baseline; gap:6px 10px; padding:5px 0; border-bottom:1px dashed var(--border); font-size:13.5px; }
+  .voce:last-child { border-bottom:none; }
+  .voce .tx { flex:1 1 auto; min-width:0; }
+  .voce .pt { flex:0 0 auto; font-family:var(--mono); font-weight:600; font-size:13px; }
+  .voce.off { color:var(--text-muted); }
+  .voce.off .pt { text-decoration:line-through; }
+  .voce.tot { border-top:2px solid var(--border-strong); border-bottom:none; font-weight:600; margin-top:2px; }
+</style>
+<style data-iphone="stile">
+/* L'avviso e' visibile per costruzione: lo nasconde solo la classe che la
+   sentinella mette quando JavaScript esiste, e lo rimostra quando il motore
+   muore. Nell'anteprima dell'iPhone nessuna delle due arriva. */
+#nomotore{background:#FCEBEB;border:1.5px solid #A32D2D;border-radius:10px;
+ padding:12px 15px;margin:0 0 1.1rem;font-size:13.5px;line-height:1.6;color:#0B0B0B;
+ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif}
+#nomotore strong{display:block;color:#A32D2D;font-size:15px;margin-bottom:4px}
+#nomotore p{margin:6px 0 0}
+#nomotore a{color:#A32D2D}
+#nomotore .nmurl{font-family:'SFMono-Regular',Consolas,Menlo,monospace;font-size:.92em;word-break:break-all}
+#nomotore .nmerr{display:block;font-family:'SFMono-Regular',Consolas,Menlo,monospace;
+ font-size:11.5px;color:#A32D2D;margin-top:6px;word-break:break-word}
+#nomotore .nmerr:empty{display:none}
+html.js #nomotore{display:none}
+html.js.motore-ko #nomotore{display:block}
+
+#nmprivacy{background:#E2F4F5;border:1px solid #A7DBDE;border-radius:8px;padding:9px 13px;
+ margin:0 0 1rem;font-size:12.5px;line-height:1.55;color:#0B0B0B;
+ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif}
+@media print{#nmprivacy{display:none}}
+</style>
+</head>
+<body>
+<div class="nomotore" id="nomotore" role="alert">
+ <strong>Motore di calcolo non attivo</strong>
+ <p>I calcoli, i filtri e i comandi di questa pagina <b>non funzionano</b>: dove leggi «—» non c'è un
+ valore. Il testo resta leggibile, i numeri che dipendono dai tuoi dati no. Non usare questa pagina
+ per decidere una dose.</p>
+ <p>Su iPhone e iPad succede sempre con un file salvato sul telefono: si apre nell'<b>anteprima</b> —
+ dall'app File, da Mail, da WhatsApp —, che mostra la pagina ma non esegue il motore, e Apple non
+ permette di aprirlo in Safari. Sull'iPhone il tool funziona aperto da questo indirizzo, in Safari: <a class="nmurl" href="https://francescofugetto-ai.github.io/tool-qt-lungo-web/">https://francescofugetto-ai.github.io/tool-qt-lungo-web/</a> — poi Condividi, «Aggiungi alla schermata Home». Dopo la prima apertura funziona anche senza rete. Su computer e Android basta aprire il file.</p>
+ <span class="nmerr" id="nmerr"></span>
+</div>
+<div class="nmprivacy" id="nmprivacy">
+ <b>Quello che scrivi resta su questo dispositivo.</b> La pagina non invia niente in rete e non
+ salva niente: nessun dato esce da qui. Per la stessa ragione, <b>chiudendola il contenuto si
+ perde</b> — copia il referto dove ti serve prima di chiudere.
+</div>
+<div class="page">
+<header class="hero">
+  <div class="kicker">Strumento · Aritmie ventricolari · ESC 2022</div>
+  <h1 class="headline">QT lungo congenito — punteggio di Schwartz modificato, diagnosi e terapia</h1>
+  <p class="lede"><strong>Come si usa.</strong> I passi 1–3 portano i reperti del punteggio modificato della ESC — ECG, anamnesi, familiari, gene — e il passo 4 ne fa il <strong>punteggio voce per voce</strong>, con la diagnosi delle raccomandazioni: QTc ≥480 ms su ECG ripetuti, punteggio oltre 3, mutazione patogena, oppure la diagnosi da considerare con QTc 460–479 ms e una sincope aritmica. Le note del punteggio che la tabella ESC non riporta — sincope e torsione che non si sommano, lo stesso familiare contato una volta, i reperti ECG che valgono senza cause secondarie — vengono dalla tabella originale dei suoi autori; per le prime due lo strumento mostra accanto quanto farebbe la somma alla lettera, la terza vale in tutte e due le letture. Il passo 5 porta il quadro clinico e ne esce il <strong>percorso della figura</strong>, con la classe di ogni passo; il passo 6 le <strong>dosi di nadololo, propranololo e mexiletina</strong> con il rene, sulla <strong>clearance di Cockcroft-Gault sul peso reale</strong> (con BMI ≥30 accanto quella sul peso aggiustato). <strong>Azzera</strong>, in alto, ricomincia.</p>
+  <div class="meta-row">
+    <span class="meta-chip"><strong>Fonte</strong> 2022 ESC Guidelines for the management of patients with ventricular arrhythmias and the prevention of sudden cardiac death</span>
+    <span class="meta-chip"><strong>Calcolo</strong> Tab. 10, p. 4076 · Rec. Table 41, pp. 4077–4078 · Fig. 31, p. 4078 · Tab. 8, pp. 4035–4036</span>
+    <span class="meta-chip"><strong>Note del punteggio</strong> Crotti, Dagradi, Schwartz, Cardiogenetics 2011, Tab. 1, p. 3</span>
+    <span class="meta-chip"><strong>Rene</strong> schede tecniche di Nadololo Cheplapharm, Inderal, Mexiletine hydrochloride (Regno Unito), Namuscla, come nel prontuario del capitolo</span>
+  </div>
+</header>
+
+<div class="bar" id="bar" aria-live="polite">
+  <span class="lbl">Punteggio</span> <span id="barPunti" class="cat kx">—</span>
+  <span class="lbl">Diagnosi</span> <span id="barDx" class="cat kx">—</span>
+  <span class="lbl">Rene</span> <span id="barRene" class="cat kx">—</span>
+  <span class="sp"></span>
+  <button class="btn" id="azzera" type="button">Azzera</button>
+</div>
+<div class="stage"><span class="stage-n">1</span><span class="stage-t">L'ECG</span><span class="stage-w">Tab. 10, p. 4076 · Rec. Table 41, p. 4077</span></div>
+<div class="card">
+  <div class="riga"><span class="fl">Sesso</span>
+    <span class="seg">
+      <label><input type="radio" name="sesso" value="m"><span>uomo</span></label>
+      <label><input type="radio" name="sesso" value="f"><span>donna</span></label>
+    </span></div>
+  <div class="riga"><span class="fl">QTc a riposo<small>ms, con la formula di Bazett</small></span><input type="number" id="qtc" min="300" max="700" step="1" inputmode="numeric" placeholder="ms"></div>
+  <div class="riga"><span class="fl">Il QTc è confermato<small>la soglia di 480 e quella di 460 chiedono ECG a 12 derivazioni ripetuti</small></span>
+    <span class="seg">
+      <label><input type="radio" name="rip" value="si"><span>su ECG ripetuti</span></label>
+      <label><input type="radio" name="rip" value="no"><span>un solo ECG</span></label>
+    </span></div>
+  <div class="riga"><span class="fl">Cause secondarie di QT lungo<small>farmaci che allungano il QT, disturbi elettrolitici, altre condizioni</small></span>
+    <span class="seg">
+      <label><input type="radio" name="sec" value="escluse"><span>escluse</span></label>
+      <label><input type="radio" name="sec" value="presenti"><span>presenti</span></label>
+    </span></div>
+  <div class="riga"><span class="fl">QTc al 4° minuto del recupero<small>ms, dopo il test da sforzo; vuoto se non eseguito</small></span><input type="number" id="rec" min="300" max="700" step="1" inputmode="numeric" placeholder="ms"></div>
+  <label class="chk"><input type="checkbox" id="tdp"><span class="tx">Torsione di punta</span></label>
+  <label class="chk"><input type="checkbox" id="alt"><span class="tx">Alternanza dell'onda T</span></label>
+  <label class="chk"><input type="checkbox" id="notch"><span class="tx">Onda T con incisura in 3 derivazioni</span></label>
+  <label class="chk"><input type="checkbox" id="fc"><span class="tx">Frequenza bassa per l'età<small>a riposo, sotto il 2° percentile per l'età: è la definizione della tabella originale; né la ESC né l'originale danno i percentili</small></span></label>
+</div>
+
+<div class="stage"><span class="stage-n">2</span><span class="stage-t">Anamnesi e familiari</span><span class="stage-w">Tab. 10, p. 4076</span></div>
+<div class="card">
+  <div class="riga"><span class="fl">Sincope</span>
+    <span class="seg">
+      <label><input type="radio" name="sinc" value="no"><span>nessuna</span></label>
+      <label><input type="radio" name="sinc" value="stress"><span>con stress</span></label>
+      <label><input type="radio" name="sinc" value="nostress"><span>senza stress</span></label>
+    </span></div>
+  <label class="chk hide" id="rigaArit"><input type="checkbox" id="arit"><span class="tx">La sincope è giudicata aritmica<small>conta per la diagnosi da considerare con QTc 460–479 ms</small></span></label>
+  <label class="chk"><input type="checkbox" id="famLqts"><span class="tx">Uno o più familiari con LQTS definita</span></label>
+  <label class="chk"><input type="checkbox" id="famMci"><span class="tx">Morte cardiaca improvvisa inspiegata prima dei 30 anni in un familiare di primo grado</span></label>
+  <label class="chk hide" id="rigaStesso"><input type="checkbox" id="stesso"><span class="tx">È lo stesso familiare<small>nella tabella originale lo stesso familiare non conta due volte</small></span></label>
+</div>
+
+<div class="stage"><span class="stage-n">3</span><span class="stage-t">Il gene</span><span class="stage-w">Tab. 10 · Rec. Table 41, p. 4077</span></div>
+<div class="card">
+  <div class="riga"><span class="fl">Test genetico</span>
+    <span class="seg">
+      <label><input type="radio" name="mut" value="pat"><span>mutazione patogena</span></label>
+      <label><input type="radio" name="mut" value="no"><span>nessuna mutazione patogena</span></label>
+      <label><input type="radio" name="mut" value="nt"><span>non eseguito</span></label>
+    </span></div>
+  <div class="riga hide" id="rigaGene"><span class="fl">Gene</span>
+    <span class="seg">
+      <label><input type="radio" name="gene" value="lqt1"><span>KCNQ1 · LQT1</span></label>
+      <label><input type="radio" name="gene" value="lqt2"><span>KCNH2 · LQT2</span></label>
+      <label><input type="radio" name="gene" value="lqt3"><span>SCN5A · LQT3</span></label>
+      <label><input type="radio" name="gene" value="altro"><span>un altro gene</span></label>
+    </span></div>
+  <div class="muted" style="font-size:12.5px;margin-top:6px">Una variante di significato incerto non è una mutazione patogena. I tre geni certi sono KCNQ1, KCNH2 e SCN5A; la causalità di altri è stata messa in dubbio (p. 4074).</div>
+</div>
+
+<div class="stage"><span class="stage-n">4</span><span class="stage-t">Punteggio e diagnosi</span><span class="stage-w">Tab. 10, p. 4076 · Rec. Table 41, p. 4077</span></div>
+<div class="card" id="outPunti"></div>
+<div class="card" id="outDx"></div>
+
+<div class="stage"><span class="stage-n">5</span><span class="stage-t">Il quadro clinico e il percorso</span><span class="stage-w">Fig. 31, p. 4078 · Rec. Table 41, pp. 4077–4078</span></div>
+<div class="card">
+  <div class="riga"><span class="fl">Quadro</span>
+    <span class="seg">
+      <label><input type="radio" name="quadro" value="arresto"><span>arresto cardiaco abortito</span></label>
+      <label><input type="radio" name="quadro" value="sincope"><span>sincope prima della terapia</span></label>
+      <label><input type="radio" name="quadro" value="asqt"><span>asintomatico, QT allungato</span></label>
+      <label><input type="radio" name="quadro" value="asnorm"><span>asintomatico, mutazione e QTc normale</span></label>
+    </span></div>
+  <div class="riga"><span class="fl">In terapia<small>betabloccante e terapie del genotipo: sincope aritmica o aritmia ventricolare non tollerata?</small></span>
+    <span class="seg">
+      <label><input type="radio" name="sint" value="si"><span>sì</span></label>
+      <label><input type="radio" name="sint" value="no"><span>no</span></label>
+      <label><input type="radio" name="sint" value="nt"><span>non ancora in terapia</span></label>
+    </span></div>
+  <div class="riga"><span class="fl">Terapia medica<small>non tollerata, o controindicata alla dose terapeutica</small></span>
+    <span class="seg">
+      <label><input type="radio" name="intoll" value="si"><span>sì</span></label>
+      <label><input type="radio" name="intoll" value="no"><span>no</span></label>
+    </span></div>
+  <label class="chk"><input type="checkbox" id="icdNo"><span class="tx">ICD controindicato o rifiutato</span></label>
+  <label class="chk"><input type="checkbox" id="shock"><span class="tx">Con ICD, betabloccante e farmaci del genotipo: shock multipli o sincopi aritmiche</span></label>
+  <div class="riga hide" id="rigaR123"><span class="fl">Calcolatore 1-2-3 LQTS<small>la stima la dà il Tool 1-2-3 LQTS, dalla Tab. 2 di Mazzanti 2018; qui non si calcola</small></span>
+    <span class="seg">
+      <label><input type="radio" name="r123" value="alto"><span>alto rischio</span></label>
+      <label><input type="radio" name="r123" value="basso"><span>non alto</span></label>
+      <label><input type="radio" name="r123" value="ns"><span>non stimato</span></label>
+    </span></div>
+  <label class="chk hide" id="rigaGrav"><input type="checkbox" id="grav"><span class="tx">Gravidanza o primo anno dopo il parto</span></label>
+</div>
+<div class="card" id="outPerc"></div>
+
+<div class="stage"><span class="stage-n">6</span><span class="stage-t">Le dosi e il rene</span><span class="stage-w">Tab. 8, pp. 4035–4036 · schede tecniche</span></div>
+<div class="card">
+  <div class="riga"><span class="fl">Età</span><input type="number" id="eta" min="0" max="110" step="1" inputmode="numeric" placeholder="anni"></div>
+  <div class="riga"><span class="fl">Peso</span><input type="number" id="peso" min="25" max="250" step="0.5" inputmode="decimal" placeholder="kg"></div>
+  <div class="riga"><span class="fl">Altezza<small>serve al BMI: dai 30 si mostra anche la clearance sul peso aggiustato</small></span><input type="number" id="alt_cm" min="120" max="220" step="1" inputmode="numeric" placeholder="cm"></div>
+  <div class="riga"><span class="fl">Creatinina</span><input type="number" id="creat" min="0.2" max="1800" step="0.01" inputmode="decimal" placeholder="—">
+    <span class="seg">
+      <label><input type="radio" name="ucr" value="mg" id="ucr_mg" checked><span>mg/dL</span></label>
+      <label><input type="radio" name="ucr" value="umol"><span>µmol/L</span></label>
+    </span></div>
+  <label class="chk"><input type="checkbox" id="dialisi"><span class="tx">In dialisi</span></label>
+  <div class="muted" style="font-size:12.5px;margin-top:6px">Il sesso è quello del passo 1.</div>
+  <div id="outRene" style="margin-top:8px"></div>
+</div>
+<div class="card farm" id="d_nad"></div>
+<div class="card farm" id="d_prop"></div>
+<div class="card farm" id="d_mex"></div>
+
+<div class="card"><h3>Limiti per questo paziente</h3><ul class="lista" id="limiti"></ul></div>
+<div class="foot">
+  <strong>Fonte.</strong> Zeppenfeld K, Tfelt-Hansen J, de Riva M, et al. 2022 ESC Guidelines for the management of patients with ventricular arrhythmias and the prevention of sudden cardiac death. <em>Eur Heart J</em> 2022;43:3997–4126, doi:10.1093/eurheartj/ehac262 — genetica, soglie diagnostiche e QT con QRS largo (p. 4074), test in piedi, test all'adrenalina, terapia e calcolatore 1-2-3 LQTS (p. 4075), mexiletina e test orale, sopravvissuti all'arresto, donne e LQT2, portatori silenti, LCSD (p. 4076), punteggio modificato (Tab. 10, p. 4076), raccomandazioni sul QT lungo (Rec. Table 41, pp. 4077–4078), percorso (Fig. 31, p. 4078), farmaci (Tab. 8, pp. 4035–4036), gravidanza (Rec. Table 47, p. 4088). <strong>Note del punteggio</strong> — sincope e torsione esclusive, frequenza sotto il 2° percentile, lo stesso familiare una volta, reperti ECG senza farmaci o disturbi che li alterino, Bazett — dalla tabella originale dei suoi autori: Crotti L, Dagradi F, Schwartz PJ. Long QT syndrome: from genetic basis to treatment. <em>Cardiogenetics</em> 2011;1(s1):e2, doi:10.4081/cardiogenetics.2011.s1.e2, Tab. 1, p. 3 (la ESC cita per la Tab. 10 Schwartz e Crotti, <em>Circulation</em> 2011;124:2181–2184, che è a pagamento). <strong>Dosi d'inizio</strong>: EHRA 2024 sulla tempesta elettrica, p. 26. <strong>Rene</strong>, dalle schede tecniche come nel prontuario del capitolo: Nadololo Cheplapharm 80 mg (AIFA, revisione di febbraio 2023, resa disponibile il 16/09/2025), Inderal 40 mg (AIFA, 21/03/2023), Mexiletine hydrochloride 100 e 200 mg (Clinigen, MHRA, 30/09/2024), Namuscla (EMA, 03/06/2026). <strong>Gravidanza</strong>, confronto: ESC 2025 sulle malattie cardiovascolari in gravidanza, pp. 4497–4498. Ogni numero mostrato porta la sua fonte.<br><br>
+  Strumento personale di studio e consultazione: <strong>non sostituisce il giudizio clinico né la scheda tecnica del farmaco</strong>. Non salva i dati e non li invia in rete.
+</div>
+</div>
+<script>
+(function () {
+  "use strict";
+
+  /* ═══ DATI ═══════════════════════════════════════════════════════════════
+     2022 ESC Guidelines for the management of patients with ventricular
+     arrhythmias and the prevention of sudden cardiac death.
+     Tab. 10, p. 4076 (guardata come immagine) — punteggio modificato:
+       QTc >=480 ms 3,5; 460-479 ms 2; 450-459 ms negli uomini 1; QTc >=480 ms
+       al 4o minuto del recupero dopo il test da sforzo 1; torsione di punta 2;
+       alternanza dell'onda T 1; onda T con incisura in 3 derivazioni 1;
+       frequenza bassa per l'eta' 0,5; sincope con stress 2, senza stress 1;
+       familiari con LQTS definita 1; morte improvvisa inspiegata prima dei
+       30 anni in un familiare di primo grado 0,5; mutazione patogena 3,5.
+       Diagnosi con punteggio >3. La tabella non ha altre note: la stampa
+       scrive «=460-479» e «=450-459», intervalli.
+     Note del punteggio, che la Tab. 10 non riporta — dalla tabella originale
+       dei suoi autori: Crotti, Dagradi, Schwartz, Cardiogenetics 2011;1(s1):e2,
+       Tab. 1, p. 3: reperti ECG in assenza di farmaci o disturbi che li
+       alterino; QTc con Bazett; torsione di punta e sincope mutuamente
+       esclusive; frequenza a riposo sotto il 2o percentile per l'eta'; lo
+       stesso familiare non conta in A e in B.
+     Rec. Table 41, p. 4077 — diagnosi con QTc >=480 ms su ECG ripetuti o
+       punteggio >3 I C; test genetico e consulenza nella diagnosi clinica
+       I C; diagnosi con mutazione patogena qualunque sia il QT I C; QTc
+       460-479 ms su ECG ripetuti con sincope aritmica, senza cause
+       secondarie, diagnosi da considerare IIa C; test all'adrenalina di
+       routine III C; misure generali I C; betabloccante, meglio nadololo o
+       propranololo, con QT allungato documentato I B; mexiletina nell'LQT3
+       con QT allungato I C; betabloccante con mutazione e QTc normale IIa B;
+       ICD in aggiunta al betabloccante dopo arresto I B; ICD nel sintomatico
+       in terapia I C. Nota d: sintomatico = sincope aritmica o aritmia
+       ventricolare non tollerata.
+     Rec. Table 41, p. 4078 — LCSD nel sintomatico con ICD controindicato o
+       rifiutato, o con ICD, betabloccante e farmaci del genotipo e shock
+       multipli o sincopi aritmiche I C; ICD o LCSD nel sintomatico che non
+       tollera la terapia IIa C; stimare il rischio da genotipo e QTc prima
+       della terapia IIa C (IIb nella Fig. 31); ICD nell'asintomatico ad alto
+       rischio secondo il calcolatore 1-2-3 LQTS IIb B; studio
+       elettrofisiologico III C.
+     Fig. 31, p. 4078 (guardata come immagine) — quattro quadri; nota a:
+       potassio, magnesio, calcio; nuoto intenso nell'LQT1, rumori forti
+       nell'LQT2. Testo: p. 4074 (con arresto basta QTc >=460 per considerare
+       la diagnosi), p. 4075 (test in piedi), p. 4076 (mexiletina: test orale,
+       il QTc si accorcia di 40 ms; recidive 14% in 5 anni dopo l'arresto;
+       donne e LQT2; LCSD non sostituisce l'ICD).
+     Tab. 8, p. 4035 — nadololo 40-120 mg; propranololo 80-320 mg;
+       controindicazioni del betabloccante. Tab. 8, p. 4036 — mexiletina
+       600-1200 mg, carico 400 mg poi 600 mg nelle prime 24 h;
+       controindicazioni. EHRA 2024, p. 26 — inizio nadololo 40 mg,
+       propranololo 80 mg una volta al giorno.
+     Rec. Table 47, p. 4088 — betabloccante continuato in gravidanza e
+       post-partum I C.
+     Schede tecniche (dal prontuario del capitolo): Nadololo Cheplapharm 4.2
+       intervallo per ClCr (mL/min/1,73 m2) >50 24 h, 31-50 24-36 h, 10-30
+       24-48 h, <10 40-60 h; 4.4 evitarlo nelle forme gravi. Inderal 4.3
+       insufficienza renale controindicata senza grado. Mexiletine
+       hydrochloride (MHRA): ClCr <30 non usare. */
+  var PUNTI = { qtc480:3.5, qtc460:2, qtc450m:1, rec480:1, tdp:2, alt:1, notch:1, fc:0.5, sincStress:2, sincNo:1, famLqts:1, famMci:0.5, mut:3.5 };
+  var SOGLIE = { qtc480:480, qtc460:460, qtc450:450, rec480:480, dx:3, qtcMin:300, qtcMax:700, adulto:18,
+                 nad50:50, nad30:30, nad10:10, mex30:30, bmiAgg:30, umol:88.4, mexTest:40 };
+  var DOSI = { nad:"40–120 mg/die", nadInizio:"40 mg una volta al giorno", prop:"80–320 mg/die", propInizio:"80 mg una volta al giorno, preferibilmente a rilascio prolungato",
+               mex:"600–1200 mg/die", mexCarico:"400 mg, poi 600 mg nelle prime 24 h" };
+
+  var T10 = "ESC 2022, Tab. 10, p. 4076", R41a = "ESC 2022, Rec. Table 41, p. 4077", R41b = "ESC 2022, Rec. Table 41, p. 4078",
+      F31 = "ESC 2022, Fig. 31, p. 4078", P74 = "ESC 2022, p. 4074", P75 = "ESC 2022, p. 4075", P76 = "ESC 2022, p. 4076",
+      T8a = "ESC 2022, Tab. 8, p. 4035", T8b = "ESC 2022, Tab. 8, p. 4036", R47 = "ESC 2022, Rec. Table 47, p. 4088",
+      ORIG = "tabella originale: Crotti, Dagradi, Schwartz 2011, Tab. 1, p. 3", EH26 = "EHRA 2024, p. 26",
+      G25 = "ESC 2025 gravidanza, pp. 4497–4498";
+
+  /* ═══ FUNZIONI DI SCRITTURA (pure) ════════════════════════════════════ */
+  function r1(x) { return Math.round(x * 10) / 10; }
+  function nf(x, d) { if (d === 0) x = Math.round(x); else x = r1(x); return String(x).replace(".", ","); }
+  function pgs(p) { return ' <span class="pg">' + p + "</span>"; }
+  function corPill(c, l) { var k = { "I":"c1", "IIa":"c2a", "IIb":"c2b", "III":"c3" }[c]; return '<span class="cor ' + k + '">' + c + "</span>" + (l ? ' <span class="cor ' + k + '" style="opacity:.85">' + l + "</span>" : ""); }
+  function st(nome, sez) { return ' <span class="pg">scheda tecnica (' + nome + (sez ? ", " + sez : "") + ")</span>"; }
+  function dv() { return ' <span class="dv">DA VERIFICARE</span>'; }
+  // Nadololo in dialisi: la stessa frase, con la stessa fonte, del Tool Extrasistoli.
+  var NAD_DIALISI = "In dialisi il nadololo è <b>con riserva</b>: la scheda tecnica dà l'intervallo fra le dosi solo per fasce di clearance e per la dialisi non ne dà uno, dice soltanto che l'emodialisi lo rimuove; nessuna fascia proposta" + st("Nadololo Cheplapharm", "4.2, 4.9") + dv() + ".";
+
+  /* ═══ FUNZIONI DI CALCOLO (pure) ══════════════════════════════════════ */
+  function inScala(x) { return x !== null && x >= SOGLIE.qtcMin && x <= SOGLIE.qtcMax; }
+
+  // Il punteggio. «tot» applica le note della tabella originale; «lett» somma
+  // alla lettera della Tab. 10, che quelle note non le riporta. Differiscono
+  // solo per sincope/torsione e per lo stesso familiare.
+  function punteggio(s) {
+    var o = { voci:[], tot:0, lett:0, manca:[], ecgVia:s.sec === "presenti" }, ecg = s.sec !== "presenti", q;
+    function voce(t, p, conta, perche) {
+      o.voci.push({ t:t, p:p, conta:conta, perche:perche || "" });
+      if (conta) { o.tot += p; o.lett += p; }
+    }
+    // QTc a riposo
+    if (s.qtc === null) o.manca.push("il QTc a riposo (passo 1)");
+    else if (!inScala(s.qtc)) o.manca.push("il QTc a riposo: " + s.qtc + " ms è fuori scala (300–700)");
+    else if (s.qtc >= SOGLIE.qtc480) voce("QTc ≥480 ms (" + s.qtc + ")", PUNTI.qtc480, ecg);
+    else if (s.qtc >= SOGLIE.qtc460) voce("QTc 460–479 ms (" + s.qtc + ")", PUNTI.qtc460, ecg);
+    else if (s.qtc >= SOGLIE.qtc450) {
+      if (!s.sesso) o.manca.push("il sesso (passo 1): fra 450 e 459 ms il punto vale solo negli uomini");
+      else if (s.sesso === "m") voce("QTc 450–459 ms in un uomo (" + s.qtc + ")", PUNTI.qtc450m, ecg);
+      else voce("QTc 450–459 ms in una donna (" + s.qtc + "): nessun punto, il punto vale solo negli uomini", 0, false);
+    } else voce("QTc sotto 450 ms (" + s.qtc + "): nessun punto", 0, false);
+    // QTc al 4o minuto del recupero
+    if (s.rec !== null) {
+      if (!inScala(s.rec)) o.manca.push("il QTc del recupero: " + s.rec + " ms è fuori scala (300–700); lascialo vuoto se il test non è stato fatto");
+      else if (s.rec >= SOGLIE.rec480) voce("QTc ≥480 ms al 4° minuto del recupero (" + s.rec + ")", PUNTI.rec480, ecg);
+      else voce("QTc al 4° minuto del recupero sotto 480 ms (" + s.rec + "): nessun punto", 0, false);
+    }
+    // torsione e sincope: mutuamente esclusive nella tabella originale
+    var tdpConta = s.tdp && ecg, sp = s.sinc === "stress" ? PUNTI.sincStress : (s.sinc === "nostress" ? PUNTI.sincNo : 0);
+    if (s.tdp) voce("Torsione di punta", PUNTI.tdp, ecg);
+    if (s.alt) voce("Alternanza dell'onda T", PUNTI.alt, ecg);
+    if (s.notch) voce("Onda T con incisura in 3 derivazioni", PUNTI.notch, ecg);
+    if (s.fc) voce("Frequenza bassa per l'età", PUNTI.fc, ecg);
+    if (!s.sinc) o.manca.push("la sincope (passo 2), anche «nessuna»");
+    else if (sp) {
+      var tsinc = "Sincope " + (s.sinc === "stress" ? "con stress" : "senza stress");
+      if (tdpConta) { voce(tsinc, sp, false, "non si somma alla torsione di punta: nella tabella originale le due voci sono esclusive (" + ORIG + ")"); o.lett += sp; }
+      else voce(tsinc, sp, true);
+    }
+    // familiari
+    if (s.famLqts) voce("Familiari con LQTS definita", PUNTI.famLqts, true);
+    if (s.famMci) {
+      if (s.famLqts && s.stesso) { voce("Morte improvvisa inspiegata prima dei 30 anni in un familiare di primo grado", PUNTI.famMci, false, "è lo stesso familiare della voce sopra: nella tabella originale non conta due volte (" + ORIG + ")"); o.lett += PUNTI.famMci; }
+      else voce("Morte improvvisa inspiegata prima dei 30 anni in un familiare di primo grado", PUNTI.famMci, true);
+    }
+    // gene
+    if (!s.mut) o.manca.push("il test genetico (passo 3), anche «non eseguito»");
+    else if (s.mut === "pat") voce("Mutazione patogena", PUNTI.mut, true);
+    if (o.ecgVia) {
+      for (q = 0; q < o.voci.length; q++) if (o.voci[q].p > 0 && !o.voci[q].conta && !o.voci[q].perche && /QTc|Torsione|Alternanza|incisura|Frequenza/.test(o.voci[q].t))
+        o.voci[q].perche = "con una causa secondaria di QT lungo i reperti ECG non contano: valgono in assenza di farmaci o disturbi che li alterino (" + ORIG + ")";
+    }
+    o.tot = Math.round(o.tot * 10) / 10; o.lett = Math.round(o.lett * 10) / 10;
+    o.completo = o.manca.length === 0;
+    return o;
+  }
+
+  // La diagnosi della Rec. Table 41, p. 4077.
+  function diagnosi(s, p) {
+    var o = { esito:"manca", crit:[], note:[], manca:[], letture:false };
+    var ecgOk = s.sec === "escluse", qOk = inScala(s.qtc);
+    if (s.mut === "pat") o.crit.push({ t:"<b>Mutazione patogena</b>: la diagnosi c'è qualunque sia il QT", c:"I", l:"C", src:R41a });
+    if (!s.sec) o.manca.push("serve sapere se le cause secondarie di QT lungo sono escluse (passo 1): i reperti ECG valgono senza farmaci o disturbi che li alterino");
+    if (s.sec === "presenti") o.note.push("<b>Causa secondaria presente</b>: i reperti ECG non contano finché non è corretta e l'ECG ripetuto (" + ORIG + "); la riga IIa C li vuole senza cause secondarie" + pgs(R41a) + ". La torsione di punta da QT lungo acquisito si tratta in acuto: sezione 4 del distillato (Rec. Table 9).");
+    // QTc >=480 su ECG ripetuti
+    if (qOk && s.qtc >= SOGLIE.qtc480 && ecgOk) {
+      if (s.rip === "si") o.crit.push({ t:"<b>QTc ≥480 ms su ECG a 12 derivazioni ripetuti</b>", c:"I", l:"C", src:R41a });
+      else if (s.rip === "no") o.note.push("QTc ≥480 ms su <b>un solo ECG</b>: il criterio del QTc chiede ECG ripetuti" + pgs(R41a) + ". Da solo vale 3,5 punti e porta il punteggio oltre 3: la diagnosi per punteggio poggia allora su una misura sola, e l'ECG va ripetuto.");
+      else o.manca.push("serve sapere se il QTc è confermato su ECG ripetuti (passo 1)");
+    }
+    // punteggio
+    if (s.sec) {
+      if (!p.completo) o.manca.push("il punteggio è incompleto: manca " + p.manca.join("; "));
+      else if (p.tot > SOGLIE.dx) o.crit.push({ t:"<b>Punteggio " + nf(p.tot) + "</b>, oltre 3", c:"I", l:"C", src:R41a + "; " + T10 });
+      else if (p.lett > SOGLIE.dx) o.letture = true;
+    }
+    // QTc 460-479 con sincope aritmica: da considerare
+    if (qOk && s.qtc >= SOGLIE.qtc460 && s.qtc < SOGLIE.qtc480 && ecgOk) {
+      var sinc = s.sinc === "stress" || s.sinc === "nostress";
+      if (s.rip === "si" && sinc && s.arit) o.crit.push({ t:"QTc 460–479 ms su ECG ripetuti con una <b>sincope aritmica</b>, senza cause secondarie: diagnosi <b>da considerare</b>", c:"IIa", l:"C", src:R41a, cons:true });
+      else if (sinc && s.arit && s.rip !== "si") o.note.push("QTc 460–479 ms con sincope aritmica: la diagnosi da considerare chiede il QTc su ECG ripetuti" + pgs(R41a) + ".");
+      if (s.quadro === "arresto" && s.rip === "si") o.note.push("Dopo un <b>arresto</b>, il testo considera sufficiente un QTc ≥460 ms per considerare la diagnosi" + pgs(P74) + "; la riga IIa C della Rec. Table 41 nomina solo la sincope aritmica.");
+    }
+    var i, piena = false, cons = false;
+    for (i = 0; i < o.crit.length; i++) { if (o.crit[i].cons) cons = true; else piena = true; }
+    if (piena) o.esito = "si";
+    else if (cons) o.esito = "considerare";
+    else if (o.letture) o.esito = "letture";
+    else if (o.manca.length) o.esito = "manca";
+    else o.esito = "no";
+    return o;
+  }
+
+  // Il percorso della Fig. 31 con le classi della Rec. Table 41.
+  function riga(t, c, l, src, att) { return { t:t, c:c || null, l:l || null, src:src, att:!!att }; }
+  function percorso(s, dx) {
+    var o = { gate:null, motivo:"", righe:[], note:[], manca:[], bb:null, mex:false, lcsd:false };
+    if (dx.esito !== "si" && dx.esito !== "considerare") { o.gate = "dx"; return o; }
+    if (!s.quadro) { o.gate = "manca"; o.motivo = "serve il quadro clinico (passo 5)"; return o; }
+    var mutPat = s.mut === "pat", g = mutPat ? s.gene : "";
+    if (s.quadro === "asnorm" && !mutPat) { o.gate = "incoerente"; o.motivo = "il quadro «asintomatico, mutazione e QTc normale» chiede una mutazione patogena (passo 3)"; return o; }
+    if (s.quadro === "asnorm" && inScala(s.qtc) && s.qtc >= SOGLIE.qtc480) { o.gate = "incoerente"; o.motivo = "un QTc di " + s.qtc + " ms non è un QTc normale: scegli il quadro «asintomatico, QT allungato»"; return o; }
+    if (mutPat && !g) { o.gate = "manca"; o.motivo = "serve il gene della mutazione (passo 3): decide la mexiletina e il calcolatore"; return o; }
+    var sint = s.quadro === "arresto" || s.quadro === "sincope" || s.sint === "si";
+    var trig = g === "lqt1" ? " — nell'LQT1 il nuoto intenso" : (g === "lqt2" ? " — nell'LQT2 i rumori forti" : " (nuoto intenso nell'LQT1, rumori forti nell'LQT2)");
+    o.sint = sint;
+    o.righe.push(riga("<b>A tutti</b>: niente farmaci che allungano il QT (l'elenco è quello di crediblemeds.org); disturbi elettrolitici evitati e corretti — potassio, magnesio, calcio; niente trigger del genotipo" + trig, "I", "C", R41a + "; " + F31 + ", nota a"));
+    if (s.quadro === "asnorm") { o.bb = { c:"IIa", l:"B" }; o.righe.push(riga("<b>Betabloccante</b> da considerare: mutazione patogena con QTc normale; il portatore silente ha un rischio basso ma non trascurabile" + pgs(P76), "IIa", "B", R41a, true)); }
+    else { o.bb = { c:"I", l:"B" }; o.righe.push(riga("<b>Betabloccante</b>, meglio non selettivo — <b>nadololo o propranololo</b>, che riducono di più il rischio" + pgs(P75) + " — con QT allungato documentato", "I", "B", R41a, true)); }
+    // QTc fra 461 e 479 ms con mutazione patogena: qui ancora «normale» (soglia diagnostica
+    // ESC 480, Rec. Table 41 p. 4077); il Tool 1-2-3 LQTS lo legge gia' allungato da 461
+    // (Mazzanti 2018, Tab. 1, nota). Decisione del medico, 07/10/2026: ogni tool tiene la
+    // sua soglia e segnala l'altra.
+    if (mutPat && (s.quadro === "asnorm" || s.quadro === "asqt") && inScala(s.qtc) && s.qtc > SOGLIE.qtc460 && s.qtc < SOGLIE.qtc480)
+      o.note.push("<b>QTc fra 461 e 479 ms</b> con mutazione patogena: qui vale ancora come <b>QTc normale</b> della riga del betabloccante " + corPill("IIa", "B") + " — la diagnosi sul solo QTc la ESC la fa da 480 ms" + pgs(R41a) + " —, mentre il <b>Tool 1-2-3 LQTS</b> lo considera già <b>allungato</b> da 461 ms (Mazzanti 2018, Tab. 1, nota: oltre 460 la forma manifesta). La ESC non definisce il QTc normale.");
+    if (g === "lqt3" && s.quadro !== "asnorm") {
+      o.mex = true;
+      o.righe.push(riga("<b>Mexiletina</b> nell'LQT3 con QT allungato. Prima della terapia cronica un <b>test orale</b>: il QTc deve accorciarsi di 40 ms; alcune mutazioni di SCN5A non rispondono" + pgs(P76), "I", "C", R41a, true));
+      o.note.push("LQT3: il ruolo del betabloccante è incerto, e la fonte non dice se la mexiletina vada da sola o insieme al betabloccante" + pgs(P76) + ".");
+    }
+    if (s.sint === "si") o.righe.push(riga("<b>ICD</b>: sintomatico in terapia — sincope aritmica o aritmia ventricolare non tollerata con betabloccante e terapie del genotipo", "I", "C", R41a, true));
+    if (s.quadro === "arresto") {
+      o.righe.push(riga("<b>ICD in aggiunta al betabloccante</b> dopo l'arresto cardiaco: anche in betabloccante le recidive sono il 14% in 5 anni" + pgs(P76), "I", "B", R41a, true));
+    } else if (s.quadro === "sincope" && s.sint !== "si") {
+      if (s.intoll === "si") o.righe.push(riga("<b>ICD oppure LCSD</b>: sintomatico che non tollera betabloccante e terapie del genotipo, o li ha controindicati alla dose terapeutica", "IIa", "C", R41b, true));
+      if (s.sint === "no" && s.intoll === "no") o.righe.push(riga("Nessun evento in terapia, terapia tollerata: <b>follow-up</b>", null, null, F31));
+      if (s.sint === "nt") o.note.push("Non ancora in terapia: dopo l'inizio, una sincope aritmica o un'aritmia non tollerata in terapia portano all'<b>ICD</b> " + corPill("I", "C") + pgs(R41a) + "; una terapia non tollerata o controindicata a <b>ICD o LCSD</b> " + corPill("IIa", "C") + pgs(R41b) + ".");
+      if (!s.sint) o.manca.push("serve sapere se in terapia ci sono stati eventi (passo 5)");
+      else if (s.sint === "no" && !s.intoll) o.manca.push("serve sapere se la terapia medica è tollerata (passo 5)");
+    } else if (s.quadro === "asqt" && s.sint !== "si") {
+      if (g === "lqt1" || g === "lqt2" || g === "lqt3") {
+        o.righe.push(riga("<b>Stimare il rischio</b> da genotipo e QTc prima di iniziare la terapia, con il calcolatore 1-2-3 LQTS (qui: il Tool 1-2-3 LQTS) — classe IIb nella figura" + pgs(F31) + ", IIa C nella tabella: è un'incoerenza della fonte", "IIa", "C", R41b));
+        if (s.r123 === "alto") o.righe.push(riga("<b>ICD</b> valutabile: asintomatico ad alto rischio secondo il calcolatore, in aggiunta alle terapie del genotipo" + (g === "lqt3" ? ", qui la mexiletina" : ""), "IIb", "B", R41b, true));
+        else if (s.r123 === "basso") o.righe.push(riga("Rischio non alto secondo il calcolatore: <b>follow-up</b>", null, null, F31));
+        else if (s.r123 === "ns") o.manca.push("la decisione sull'ICD resta aperta finché il rischio 1-2-3 LQTS non è stimato");
+        else o.manca.push("serve il giudizio del calcolatore 1-2-3 LQTS (passo 5): il rischio della cella lo dà il Tool 1-2-3 LQTS");
+      } else {
+        o.righe.push(riga("Il calcolatore 1-2-3 LQTS vale solo per LQT1, LQT2 e LQT3" + (g === "altro" ? "" : ", e qui il genotipo non è noto") + ": per questo quadro la figura non dà altro — <b>follow-up</b>", null, null, F31));
+      }
+      if (s.intoll === "si") o.note.push("Asintomatico che non tollera la terapia: la riga «ICD o LCSD» " + corPill("IIa", "C") + " è scritta per il sintomatico" + pgs(R41b) + "; per l'asintomatico la fonte non dà una raccomandazione.");
+    } else if (s.quadro === "asnorm" && s.sint !== "si") {
+      o.righe.push(riga("Poi <b>follow-up</b>: per questo quadro la figura si ferma qui", null, null, F31));
+    }
+    // Nella Fig. 31 la LCSD di Classe I sta dopo «ICD controindicato, rifiutato
+    // o shock ripetuti», a cui si arriva solo da un ICD indicato: l'ICD I dopo
+    // l'arresto o con eventi in terapia, il riquadro ICD/LCSD IIa della terapia
+    // non tollerata; il testo la vuole per il sintomatico «nonostante il
+    // betabloccante» (p. 4076). Senza un ICD indicato il rifiuto non porta qui.
+    var icdInd = s.quadro === "arresto" || s.sint === "si" || (s.quadro === "sincope" && s.sint === "no" && s.intoll === "si");
+    var icdRif = s.icdNo && icdInd;
+    if (s.shock || icdRif) {
+      o.lcsd = true;
+      o.righe.push(riga("<b>LCSD</b> (denervazione simpatica cardiaca sinistra): sintomatico con " + (icdRif ? "ICD controindicato o rifiutato" : "") + (icdRif && s.shock ? ", oppure " : "") + (s.shock ? "shock multipli o sincopi aritmiche nonostante ICD, betabloccante e farmaci del genotipo" : ""), "I", "C", R41b, true));
+      o.note.push("La LCSD non sostituisce l'ICD nell'alto rischio: metà dei pazienti ha eventi dopo l'intervento" + pgs(P76) + ".");
+    } else if (s.icdNo && sint) o.note.push("ICD controindicato o rifiutato: nella figura la LCSD " + corPill("I", "C") + " viene dopo un ICD indicato — dopo l'arresto, con eventi in terapia o con la terapia non tollerata" + pgs(F31) + "; il testo la vuole nel sintomatico nonostante il betabloccante" + pgs(P76) + ". Qui l'ICD non è indicato" + (s.sint === "nt" ? ": prima si inizia la terapia" : (s.sint === "no" && s.intoll === "no" ? ": senza eventi e con la terapia tollerata la figura dà il follow-up" : "")) + ".");
+    if (s.icdNo && !sint && !s.shock) o.note.push("ICD controindicato o rifiutato in un asintomatico: la LCSD " + corPill("I", "C") + " è scritta per il sintomatico" + pgs(R41b) + ".");
+    o.righe.push(riga("<b>Non</b> fare lo studio elettrofisiologico per stratificare il rischio", "III", "C", R41b));
+    if (s.sesso === "f") {
+      o.note.push("Donne, soprattutto LQT2: rischio aritmico più alto in gravidanza e soprattutto nel primo anno dopo il parto" + pgs(P76) + ".");
+      if (s.grav) {
+        o.righe.push(riga("<b>Continuare il betabloccante</b> in gravidanza e nel post-partum", "I", "C", R47, true));
+        o.note.push("<b>Confronto — ESC 2025 sulla gravidanza</b>" + pgs(G25) + ": il betabloccante alla dose di prima della gravidanza, nadololo o propranololo, sale a I B e si continua nell'allattamento (I B); nell'LQT2 la dose pre-gravidanza soprattutto nel post-partum (I B); nella portatrice con QTc normale betabloccante in gravidanza, post-partum e allattamento IIa C; LCSD prima della gravidanza nelle donne ad alto rischio non protette dai farmaci IIa C. Il nadololo passa nel latte più del propranololo. Questo strumento segue la 2022 e riporta la 2025 accanto.");
+      }
+    }
+    if (s.quadro === "sincope" && s.sinc === "no") o.note.push("Quadro «sincope prima della terapia», ma al passo 2 la sincope è «nessuna»: il punteggio non la conta.");
+    return o;
+  }
+
+  /* ═══ RENE ═══════════════════════════════════════════════════════════ */
+  function creatMg(s) {
+    if (s.creat === null) return { v:null };
+    if (s.ucr === "umol") {
+      if (s.creat < 18 || s.creat > 1800) return { v:null, fuori:true };
+      return { v:s.creat / SOGLIE.umol, umol:s.creat };
+    }
+    if (s.creat < 0.2 || s.creat > 20) return { v:null, fuori:true };
+    return { v:s.creat, umol:s.creat * SOGLIE.umol };
+  }
+  // Cockcroft-Gault sul peso REALE, che decide (decisione del medico del
+  // 03/10/2026). Con BMI >=30 accanto quella sul peso aggiustato: ideale di
+  // Devine + 0,4 x l'eccesso, come negli altri tool del progetto.
+  function clearance(s) {
+    var o = { clcr:null, agg:null, bmi:null, ibw:null, pesoAgg:null, mg:null, umol:null, manca:[], fuori:false, bambino:false };
+    if (s.peso !== null && s.alt !== null) o.bmi = s.peso / Math.pow(s.alt / 100, 2);
+    var c = creatMg(s);
+    o.mg = c.v; o.umol = c.umol || null;
+    if (s.eta === null) o.manca.push("età");
+    else if (s.eta < SOGLIE.adulto) { o.bambino = true; o.manca.push("età adulta: Cockcroft-Gault non vale sotto i 18 anni"); }
+    if (!s.sesso) o.manca.push("sesso (passo 1)");
+    if (s.peso === null) o.manca.push("peso");
+    if (s.creat === null) o.manca.push("creatinina");
+    else if (c.fuori) { o.fuori = true; o.manca.push("creatinina fuori scala per l'unità scelta"); }
+    if (o.manca.length) return o;
+    var f = s.sesso === "f" ? 0.85 : 1;
+    o.clcr = ((140 - s.eta) * s.peso * f) / (72 * c.v);
+    if (o.bmi !== null && o.bmi >= SOGLIE.bmiAgg) {
+      o.ibw = (s.sesso === "f" ? 45.5 : 50) + 0.9 * (s.alt - 152.4);
+      if (o.ibw > 0 && s.peso > o.ibw) { o.pesoAgg = o.ibw + 0.4 * (s.peso - o.ibw); o.agg = ((140 - s.eta) * o.pesoAgg * f) / (72 * c.v); }
+    }
+    return o;
+  }
+  // Nadololo, scheda tecnica 4.2: fasce intere in mL/min/1,73 m2 (>50, 31-50,
+  // 10-30, <10). Fra 30 e 31 la fascia 31-50, la piu' vicina per difetto di
+  // scrittura; a 30 esatti la 10-30, come la scrive la scheda.
+  function nadFascia(cl) {
+    if (cl === null) return null;
+    if (cl > SOGLIE.nad50) return "24";
+    if (cl > SOGLIE.nad30) return "24–36";
+    if (cl >= SOGLIE.nad10) return "24–48";
+    return "40–60";
+  }
+  function mexEsclusa(cl) { return cl !== null && cl < SOGLIE.mex30; }
+  function incroci(cl, agg) {
+    var o = [];
+    if (cl === null || agg === null) return o;
+    if (nadFascia(cl) !== nadFascia(agg)) o.push({ f:"nadololo", s:(Math.max(cl, agg) > SOGLIE.nad50 && Math.min(cl, agg) <= SOGLIE.nad50 ? "50" : (Math.max(cl, agg) > SOGLIE.nad30 && Math.min(cl, agg) <= SOGLIE.nad30 ? "30" : "10")) });
+    if (mexEsclusa(cl) !== mexEsclusa(agg)) o.push({ f:"mexiletina", s:"30" });
+    return o;
+  }
+
+  /* ═══ FARMACI ════════════════════════════════════════════════════════ */
+  function farmaci(s, cl, perc) {
+    var f = { nad:{ righe:[] }, prop:{ righe:[] }, mex:{ righe:[] } }, k;
+    if (perc.gate) {
+      for (k in f) if (f.hasOwnProperty(k)) { f[k].stato = "manca"; f[k].perche = perc.gate === "dx" ? "la terapia segue la diagnosi (passo 4)" : perc.motivo; }
+      return f;
+    }
+    f.nad.stato = f.prop.stato = "ok"; f.nad.cor = f.prop.cor = perc.bb;
+    f.mex.stato = perc.mex ? "ok" : "np"; f.mex.cor = perc.mex ? { c:"I", l:"C" } : null;
+    if (!perc.mex) f.mex.perche = "solo nell'LQT3 con QT allungato" + pgs(R41a);
+    var adulto = s.eta !== null && s.eta >= SOGLIE.adulto, x = incroci(cl.clcr, cl.agg), i;
+    function avvisoAgg(chi) { for (i = 0; i < x.length; i++) if (x[i].f === chi) return "<b>Peso aggiustato</b>: clearance " + nf(cl.agg) + " mL/min, dall'altra parte della soglia di " + x[i].s + ". Decide il peso reale (decisione del medico, 03/10/2026); la scelta resta clinica."; return ""; }
+    if (s.eta === null || !adulto) {
+      var pq = s.eta === null ? "serve l'età (passo 6): le dosi sono dell'adulto" : "sotto i 18 anni le dosi dell'adulto della Tab. 8 non valgono e Cockcroft-Gault non vale: lo strumento non dà né le dosi né il rene";
+      for (k in f) if (f.hasOwnProperty(k) && f[k].stato === "ok") f[k].senzaDose = pq;
+      return f;
+    }
+    var ci = "<b>Controindicazioni del betabloccante</b>: disfunzione grave del nodo del seno, disturbi gravi della conduzione AV, scompenso non compensato, vasospasmo coronarico, asma grave, sindrome di Brugada" + pgs(T8a) + ".";
+    // nadololo
+    f.nad.righe.push("<b>Dose</b>: <b>" + DOSI.nad + "</b>" + pgs(T8a) + "; di solito si parte da <b>" + DOSI.nadInizio + "</b>" + pgs(EH26) + ". Emivita 20–24 h" + pgs(T8a) + ".");
+    if (s.dialisi) { f.nad.stato = "ris"; f.nad.righe.push("<b>Rene</b>. " + NAD_DIALISI); }
+    else if (cl.clcr === null) f.nad.righe.push("<b>Rene</b>: — serve la clearance (" + cl.manca.join(", ") + "): l'intervallo fra le dosi si allunga sotto 50 mL/min" + st("Nadololo Cheplapharm", "4.2") + ".");
+    else {
+      var fa = nadFascia(cl.clcr);
+      f.nad.righe.push("<b>Rene</b>: ClCr " + nf(cl.clcr) + " mL/min → " + (fa === "24" ? "<b>una dose ogni 24 h</b>, nessun aggiustamento (&gt;50)" : "<b>una dose ogni " + fa + " h</b> (" + (fa === "24–36" ? "31–50" : (fa === "24–48" ? "10–30" : "&lt;10")) + ")") + st("Nadololo Cheplapharm", "4.2") + ". La scheda scrive la clearance in mL/min/1,73 m²; lo strumento usa la Cockcroft-Gault in mL/min. " + (fa === "24" ? "" : "Va evitato nelle forme gravi, senza una soglia" + st("Nadololo Cheplapharm", "4.4") + dv() + " quale clearance sia «grave»."));
+      if (avvisoAgg("nadololo")) f.nad.righe.push(avvisoAgg("nadololo"));
+    }
+    f.nad.righe.push(ci);
+    f.nad.righe.push("In scheda tecnica l'indicazione è solo per le extrasistoli ventricolari, non per il QT lungo; è l'unico nadololo in Italia ed è <b>in carenza</b> dal 23/06/2026 al 30/04/2027 presunta, con importazione autorizzata per le strutture" + st("Nadololo Cheplapharm 80 mg") + ".");
+    // propranololo
+    f.prop.righe.push("<b>Dose</b>: <b>" + DOSI.prop + "</b>" + pgs(T8a) + "; di solito si parte da <b>" + DOSI.propInizio + "</b>" + pgs(EH26) + ". In Italia il rilascio prolungato non c'è (solo Inderal 40 mg): la scheda dà 10–40 mg tre o quattro volte al giorno" + st("Inderal") + ".");
+    f.prop.righe.push("<b>Rene</b>: " + (cl.clcr !== null ? "ClCr " + nf(cl.clcr) + " mL/min. " : (s.dialisi ? "in dialisi. " : "— clearance non calcolata (" + cl.manca.join(", ") + "). ")) + "La scheda tecnica mette l'«insufficienza renale» fra le controindicazioni, senza grado, e chiede cautela nella dose iniziale" + st("Inderal", "4.2, 4.3, 4.4") + dv() + " da quale grado valga la controindicazione.");
+    if (s.dialisi) f.prop.stato = "ris";
+    f.prop.righe.push(ci);
+    f.prop.righe.push("Nessuna scheda tecnica nomina il QT lungo" + st("Inderal") + ".");
+    // mexiletina
+    if (perc.mex) {
+      f.mex.righe.push("<b>Dose</b>: <b>" + DOSI.mex + "</b>; carico <b>" + DOSI.mexCarico + "</b>" + pgs(T8b) + ". La fonte non dice a quale sale si riferisca. Il <b>test orale</b> prima della terapia cronica deve accorciare il QTc di 40 ms" + pgs(P76) + "; la dose del test" + dv() + ": nessuna fonte del capitolo la dà.");
+      if (s.dialisi) { f.mex.stato = "no"; f.mex.righe.push("<b>Rene</b>: in dialisi — la scheda britannica non la usa con ClCr &lt;30 (nessuna esperienza)" + st("Mexiletine hydrochloride, MHRA") + "; lo strumento tratta la dialisi come ClCr &lt;30."); }
+      else if (cl.clcr === null) f.mex.righe.push("<b>Rene</b>: — serve la clearance (" + cl.manca.join(", ") + "): sotto 30 mL/min non si usa" + st("Mexiletine hydrochloride, MHRA") + ".");
+      else if (mexEsclusa(cl.clcr)) { f.mex.stato = "no"; f.mex.righe.push("<b>Rene</b>: ClCr " + nf(cl.clcr) + " mL/min (&lt;30): <b>non usare</b>, nessuna esperienza" + st("Mexiletine hydrochloride, MHRA") + "; Namuscla nell'insufficienza grave «non raccomandata», senza soglia" + st("Namuscla, EMA") + "."); }
+      else f.mex.righe.push("<b>Rene</b>: ClCr " + nf(cl.clcr) + " mL/min (≥30): nessun aggiustamento nell'insufficienza lieve-moderata" + st("Mexiletine hydrochloride, MHRA") + "; Namuscla nell'insufficienza grave «non raccomandata», senza soglia" + st("Namuscla, EMA") + ".");
+      if (avvisoAgg("mexiletina")) f.mex.righe.push(avvisoAgg("mexiletina"));
+      f.mex.righe.push("<b>Controindicazioni</b>: disfunzione del nodo del seno, disturbi gravi della conduzione AV, scompenso grave" + pgs(T8b) + ".");
+      f.mex.righe.push("<b>In Italia non c'è una mexiletina antiaritmica</b>: c'è solo Namuscla, per la miotonia, in capsule dichiarate in mg di base, che controindica la tachiaritmia ventricolare" + st("Namuscla, EMA") + "; l'indicazione antiaritmica c'è nel Regno Unito, in capsule in mg di cloridrato (100 mg = 83,10 mg di base)" + st("Mexiletine hydrochloride, MHRA") + ".");
+    }
+    return f;
+  }
+
+  /* ═══ STATO E DISEGNO ═════════════════════════════════════════════════ */
+  function el(id) { return document.getElementById(id); }
+  function ckv(id) { var e = el(id); return !!(e && e.checked); }
+  function num(id) { var v = el(id).value; if (v === "") return null; var n = parseFloat(String(v).replace(",", ".")); return isNaN(n) ? null : n; }
+  function radio(n) { var e = document.querySelector('input[name="' + n + '"]:checked'); return e ? e.value : ""; }
+  function nota(g, t) { return '<div class="nota ' + (g || "") + '">' + t + "</div>"; }
+  function chip(k, t) { return '<span class="cat ' + k + '">' + t + "</span>"; }
+  function passo(t, att) { return '<div class="passo' + (att ? " att" : "") + '"><span class="ico">' + (att ? "→" : "·") + '</span><span class="tx">' + t + "</span></div>"; }
+  function mostra(id, si) { var e = el(id); e.className = e.className.replace(/(^|\s)hide(\s|$)/g, " ").replace(/\s+$/, "").replace(/^\s+/, ""); if (!si) e.className += " hide"; }
+
+  function S() {
+    var ids = ["tdp", "notch", "fc", "arit", "famLqts", "famMci", "stesso", "icdNo", "shock", "grav", "dialisi"], s = {}, i;
+    for (i = 0; i < ids.length; i++) s[ids[i]] = ckv(ids[i]);
+    s.altT = ckv("alt"); s.altCm = num("alt_cm");
+    s.qtc = num("qtc"); s.rec = num("rec"); s.eta = num("eta"); s.peso = num("peso"); s.creat = num("creat");
+    s.sesso = radio("sesso"); s.rip = radio("rip"); s.sec = radio("sec"); s.sinc = radio("sinc"); s.mut = radio("mut");
+    s.gene = s.mut === "pat" ? radio("gene") : ""; s.quadro = radio("quadro"); s.sint = radio("sint"); s.intoll = radio("intoll");
+    s.r123 = radio("r123"); s.ucr = radio("ucr") || "mg";
+    // le righe nascoste non contano
+    if (s.sinc !== "stress" && s.sinc !== "nostress") s.arit = false;
+    if (!(s.famLqts && s.famMci)) s.stesso = false;
+    if (s.sesso !== "f") s.grav = false;
+    return s;
+  }
+
+  var NOMI = { nad:"Nadololo", prop:"Propranololo", mex:"Mexiletina" };
+  var CHIP = { ok:["k0", "indicato"], ris:["k2", "con riserva"], no:["k4", "escluso"], np:["kx", "non indicato"], manca:["kx", "—"] };
+
+  function disegnaFarmaco(k, o) {
+    var h = "", c = CHIP[o.stato], i;
+    h += '<div class="esito"><span class="nome">' + NOMI[k] + "</span>" + chip(c[0], c[1]) + (o.cor && o.stato !== "manca" && o.stato !== "np" ? " " + corPill(o.cor.c, o.cor.l) + pgs(R41a) : "") + "</div>";
+    if (o.perche) h += passo('<span class="muted">—</span> ' + o.perche + ".");
+    if (o.senzaDose) h += passo('<span class="muted">—</span> ' + o.senzaDose + ".");
+    for (i = 0; i < o.righe.length; i++) h += passo(o.righe[i], i === 0 && o.stato === "ok");
+    return h;
+  }
+
+  function disegna() {
+    var s = S(), i, k;
+    var sc = { tdp:s.tdp, alt:s.altT, notch:s.notch, fc:s.fc, qtc:s.qtc, rec:s.rec, sesso:s.sesso, sec:s.sec, sinc:s.sinc, famLqts:s.famLqts, famMci:s.famMci, stesso:s.stesso, mut:s.mut };
+    var chk = document.querySelectorAll(".chk");
+    for (i = 0; i < chk.length; i++) {
+      var inp = chk[i].querySelector("input"), on = !!(inp && inp.checked);
+      if (on && (" " + chk[i].className + " ").indexOf(" on ") < 0) chk[i].className += " on";
+      if (!on) chk[i].className = chk[i].className.replace(/(^|\s)on(\s|$)/g, " ").replace(/\s+$/, "");
+    }
+    mostra("rigaArit", s.sinc === "stress" || s.sinc === "nostress");
+    mostra("rigaStesso", ckv("famLqts") && ckv("famMci"));
+    mostra("rigaGene", s.mut === "pat");
+    mostra("rigaR123", s.quadro === "asqt" && s.mut === "pat" && (s.gene === "lqt1" || s.gene === "lqt2" || s.gene === "lqt3"));
+    mostra("rigaGrav", s.sesso === "f");
+
+    /* punteggio */
+    var p = punteggio(sc), hp = "";
+    hp += '<div class="esito"><span class="big">Punteggio ' + (p.completo ? nf(p.tot) : "—") + "</span>" + (p.completo ? chip(p.tot > SOGLIE.dx ? "k4" : "k1", p.tot > SOGLIE.dx ? "oltre 3: diagnostico" : "3 o meno: non diagnostico") : chip("kx", "incompleto")) + pgs(T10) + "</div>";
+    if (!p.completo) hp += nota("info", "<b>Manca</b> " + p.manca.join("; ") + ".");
+    for (i = 0; i < p.voci.length; i++) {
+      var v = p.voci[i];
+      hp += '<div class="voce' + (v.conta ? "" : " off") + '"><span class="tx">' + v.t + (v.perche ? '<br><span class="muted" style="font-size:12px">' + v.perche + "</span>" : "") + '</span><span class="pt">' + (v.p ? "+" + nf(v.p) : "0") + "</span></div>";
+    }
+    if (!p.voci.length) hp += '<div class="voce"><span class="tx muted">Nessuna voce ancora segnata.</span><span class="pt">0</span></div>';
+    if (p.completo) hp += '<div class="voce tot"><span class="tx">Totale</span><span class="pt">' + nf(p.tot) + "</span></div>";
+    if (p.completo && p.lett !== p.tot) hp += nota(p.lett > SOGLIE.dx && p.tot <= SOGLIE.dx ? "" : "info", "<b>Due letture.</b> La Tab. 10 della ESC non riporta le note della tabella originale: sommando alla lettera il punteggio sarebbe <b>" + nf(p.lett) + "</b>" + (p.lett > SOGLIE.dx && p.tot <= SOGLIE.dx ? ", <b>oltre 3</b>: le due letture danno una diagnosi diversa, e la scelta è del medico" : "; la diagnosi non cambia") + ".");
+    hp += '<div class="muted" style="font-size:12.5px;margin-top:8px">Diagnosi con punteggio oltre 3' + pgs(T10) + ". QTc con la formula di Bazett, reperti ECG senza farmaci o disturbi che li alterino" + pgs(ORIG) + ". Con un QRS largo il QT va corretto per la durata del QRS: la fonte nomina una formula senza darla" + pgs(P74) + ".</div>";
+    el("outPunti").innerHTML = hp;
+
+    /* diagnosi */
+    var dx = diagnosi({ mut:s.mut, sec:s.sec, qtc:s.qtc, rip:s.rip, sinc:s.sinc, arit:s.arit, quadro:s.quadro }, p), hd = "";
+    var DXT = { si:["k4", "LQTS: diagnosi fatta"], considerare:["k3", "LQTS: diagnosi da considerare"], letture:["k2", "dipende dalla lettura"], manca:["kx", "diagnosi —"], no:["k1", "criteri non soddisfatti"] };
+    hd += '<div class="esito"><span class="big">' + DXT[dx.esito][1] + "</span></div>";
+    for (i = 0; i < dx.crit.length; i++) hd += passo(dx.crit[i].t + " " + corPill(dx.crit[i].c, dx.crit[i].l) + pgs(dx.crit[i].src) + ".", true);
+    if (dx.esito === "letture") hd += nota("", "Con le note della tabella originale il punteggio è <b>" + nf(p.tot) + "</b> e non basta; alla lettera della Tab. 10 è <b>" + nf(p.lett) + "</b> e basta. La ESC non dice quale leggere: decide il medico. Lo strumento non propone la terapia finché la diagnosi non è fatta per un'altra via.");
+    if (dx.esito !== "si") for (i = 0; i < dx.manca.length; i++) hd += passo('<span class="muted">—</span> ' + dx.manca[i] + ".");
+    for (i = 0; i < dx.note.length; i++) hd += nota("info", dx.note[i]);
+    if (dx.esito === "si" || dx.esito === "considerare") {
+      if (s.mut === "nt") hd += passo("<b>Test genetico e consulenza genetica</b> nella diagnosi clinica " + corPill("I", "C") + pgs(R41a) + ": decide la terapia del genotipo e trova i parenti a rischio" + pgs(P75) + ".", true);
+      else if (s.mut === "no") hd += passo("Test genetico già eseguito senza mutazione patogena: la diagnosi resta clinica. Il test si raccomanda in ogni diagnosi clinica " + corPill("I", "C") + pgs(R41a) + ".");
+      if (dx.esito === "considerare") hd += nota("", "La diagnosi è <b>da considerare</b> " + corPill("IIa", "C") + ": il percorso qui sotto vale se la si accetta.");
+    }
+    if (dx.esito === "no") {
+      hd += passo("Nessun criterio della Rec. Table 41 è soddisfatto: punteggio " + nf(p.tot) + ", non oltre 3; nessun QTc ≥480 ms su ECG ripetuti; nessuna mutazione patogena" + pgs(R41a) + ".");
+      hd += passo("Il passaggio rapido dal decubito alla posizione eretta, misurando il QT, può aiutare la diagnosi" + pgs(P75) + ".");
+    }
+    hd += passo("<b>Non</b> fare di routine il test all'adrenalina per la diagnosi " + corPill("III", "C") + pgs(R41a) + ".");
+    el("outDx").innerHTML = hd;
+
+    /* percorso */
+    var perc = percorso(s, dx), hc = "";
+    if (perc.gate === "dx") hc += '<div class="esito">' + chip("kx", "percorso —") + '<span class="muted">la terapia segue la diagnosi (passo 4)</span></div>';
+    else if (perc.gate) hc += '<div class="esito">' + chip("kx", "percorso —") + '<span class="muted">' + perc.motivo + "</span></div>";
+    else {
+      for (i = 0; i < perc.righe.length; i++) { var r = perc.righe[i]; hc += passo(r.t + (r.c ? " " + corPill(r.c, r.l) : "") + pgs(r.src) + ".", r.att); }
+      for (i = 0; i < perc.manca.length; i++) hc += passo('<span class="muted">—</span> ' + perc.manca[i] + ".");
+      for (i = 0; i < perc.note.length; i++) hc += nota("info", perc.note[i]);
+    }
+    el("outPerc").innerHTML = hc;
+
+    /* rene */
+    var cl = clearance({ eta:s.eta, sesso:s.sesso, peso:s.peso, alt:s.altCm, creat:s.creat, ucr:s.ucr }), hr = "", inc = incroci(cl.clcr, cl.agg);
+    if (cl.clcr !== null) {
+      hr += '<div class="esito"><span class="big">Clearance ' + nf(cl.clcr) + " mL/min</span>" + chip(cl.clcr < 30 ? "k4" : (cl.clcr <= 50 ? "k3" : "k1"), "Cockcroft-Gault, peso reale " + nf(s.peso) + " kg") + "</div>";
+      hr += '<div class="muted" style="font-size:12.5px;margin-bottom:4px">Creatinina ' + cl.mg.toFixed(2).replace(".", ",") + " mg/dL = " + nf(cl.umol, 0) + " µmol/L (1 mg/dL = 88,4 µmol/L)" + (cl.bmi !== null ? " · BMI " + nf(cl.bmi) : "") + "</div>";
+      if (cl.agg !== null) hr += '<div class="esito">' + chip("kx", "peso aggiustato " + nf(cl.pesoAgg, 0) + " kg: clearance " + nf(cl.agg)) + '<span class="muted">accanto, non decide (ideale di Devine ' + nf(cl.ibw, 0) + " kg + 0,4 × l'eccesso)</span></div>";
+      if (inc.length) { var tx = []; for (i = 0; i < inc.length; i++) tx.push(inc[i].f + " (soglia " + inc[i].s + ")"); hr += nota("", "<b>Ai lati di una soglia</b>: peso reale e peso aggiustato cadono ai lati opposti per " + tx.join("; ") + ". Decide il peso reale (decisione del medico, 03/10/2026); la scelta resta clinica."); }
+    } else hr += '<div class="esito">' + chip("kx", "clearance —") + '<span class="muted">' + (cl.bambino ? "sotto i 18 anni Cockcroft-Gault non vale: lo strumento non stima il rene" : "mancano: " + cl.manca.join(", ")) + "</span></div>";
+    if (s.dialisi) hr += '<div class="esito">' + chip("k4", "dialisi") + '<span class="muted">nadololo e propranololo con riserva, mexiletina esclusa</span></div>';
+    el("outRene").innerHTML = hr;
+
+    var fm = farmaci(s, cl, perc), ord = ["nad", "prop", "mex"];
+    for (i = 0; i < ord.length; i++) { k = ord[i]; el("d_" + k).className = "card farm s-" + fm[k].stato; el("d_" + k).innerHTML = disegnaFarmaco(k, fm[k]); }
+
+    /* limiti */
+    var lim = [];
+    lim.push("La Tab. 10 è il punteggio <b>modificato</b> della ESC: QTc ≥480 ms e mutazione patogena valgono 3,5 punti ciascuno, e da soli superano la soglia; la sordità congenita della tabella originale non c'è. La ESC dà una sola soglia, oltre 3, senza le fasce di probabilità dell'originale" + pgs(T10) + ".");
+    lim.push("Le note della tabella originale — sincope e torsione esclusive, lo stesso familiare una volta, i reperti ECG senza cause secondarie — la Tab. 10 non le stampa: lo strumento le applica e, dove le prime due cambiano il totale, mostra accanto la somma alla lettera" + pgs(ORIG) + ". I reperti ECG con una causa secondaria non contano in nessuna delle due letture: anche la riga IIa C della diagnosi chiede che le cause secondarie siano escluse" + pgs(R41a) + ".");
+    lim.push("La frequenza bassa per l'età è sotto il 2° percentile a riposo: né la ESC né la tabella originale danno i percentili, e lo strumento non li calcola.");
+    lim.push("Il <b>calcolatore 1-2-3 LQTS</b> qui non si calcola: lo legge il <b>Tool 1-2-3 LQTS</b>, dalla Tab. 2 del paper che lo fonda (Mazzanti 2018, PMID 29650123) — rischio a 5 anni per fasce di 10 ms di QTc e per genotipo; il paper e il suo supplementare non pubblicano la formula. La ESC non dice da quale rischio sia «alto»" + pgs(R41b) + ".");
+    if (s.mut === "pat" && s.gene === "altro") lim.push("Gene diverso da KCNQ1, KCNH2, SCN5A: la causalità di diversi geni minori è stata messa in dubbio" + pgs(P74) + "; il calcolatore e la mexiletina non lo riguardano.");
+    lim.push("Dosi dell'adulto, fisse e non per peso: sotto i 18 anni lo strumento non le dà. Clearance di Cockcroft-Gault sul peso reale, che decide; con BMI ≥30 accanto quella sul peso aggiustato (ideale di Devine + 0,4 × l'eccesso), con un avviso se le due cadono ai lati di una soglia del farmaco (decisione del medico, 03/10/2026). Le schede tecniche non dicono su quale peso.");
+    if (cl.clcr !== null && s.altCm === null) lim.push("Altezza non indicata: il BMI non si calcola e manca il confronto col peso aggiustato; nell'obeso la clearance sul peso reale la sovrastima.");
+    lim.push("Fuori dallo strumento: la torsione di punta da QT lungo acquisito e la tempesta (sezione 4 del distillato); Andersen-Tawil e Timothy (sezione 17.5); il tipo di ICD e la sua programmazione; il QT lungo nel bambino.");
+    el("limiti").innerHTML = "<li>" + lim.join("</li><li>") + "</li>";
+
+    function bar(id, kk, x) { var b = el(id); b.className = "cat " + kk; b.innerHTML = x; }
+    bar("barPunti", p.completo ? (p.tot > SOGLIE.dx ? "k4" : "k1") : "kx", p.completo ? nf(p.tot) + (p.lett !== p.tot ? " (alla lettera " + nf(p.lett) + ")" : "") : "—");
+    bar("barDx", DXT[dx.esito][0], { si:"fatta", considerare:"da considerare", letture:"due letture", manca:"—", no:"non fatta" }[dx.esito]);
+    bar("barRene", s.dialisi ? "k4" : (cl.clcr !== null ? (cl.clcr < 30 ? "k4" : (cl.clcr <= 50 ? "k3" : "k1")) : "kx"), s.dialisi ? "dialisi" : (cl.clcr !== null ? "ClCr " + nf(cl.clcr, 0) : "—"));
+  }
+
+  document.addEventListener("input", disegna);
+  document.addEventListener("change", disegna);
+  el("azzera").addEventListener("click", function () {
+    var ins = document.querySelectorAll("input"), i;
+    for (i = 0; i < ins.length; i++) {
+      if (ins[i].type === "checkbox" || ins[i].type === "radio") ins[i].checked = false;
+      else ins[i].value = "";
+    }
+    el("ucr_mg").checked = true;
+    disegna();
+    window.scrollTo(0, 0);
+  });
+
+  window.QT_MOTORE = { punteggio:punteggio, diagnosi:diagnosi, percorso:percorso, clearance:clearance, nadFascia:nadFascia, mexEsclusa:mexEsclusa, incroci:incroci };
+  disegna();
+})();
+</script>
+<script data-iphone="web">
+// Solo da un indirizzo https, cioe' dalla pagina pubblicata: aperto come file
+// il tool non cerca ne' manifest ne' service worker, che accanto al file non
+// ci sono. Un errore qui non deve fermare niente: e' un di piu'.
+(function(){
+if(location.protocol!=="https:") return;
+try{
+  var t=document.getElementsByTagName("head")[0];
+  var m=document.createElement("link"); m.rel="manifest"; m.href="manifest.webmanifest";
+  var i=document.createElement("link"); i.rel="apple-touch-icon"; i.href="icona-180.png";
+  t.appendChild(m); t.appendChild(i);
+  if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js")["catch"](function(){});
+}catch(e){}
+})();
+</script>
+<script data-iphone="fine">document.documentElement.className+=" motore-ok";</script>
+</body>
+</html>
